@@ -557,6 +557,17 @@ void t_js_generator::generate_js_struct_definition(ofstream& out,
       }
     }
 
+    // Early returns for exceptions
+    for (m_iter = members.begin(); m_iter != members.end(); ++m_iter) {
+    	t_type* t = get_true_type((*m_iter)->get_type());
+    	if (t->is_xception()) {
+			out << indent() <<  "if (args instanceof " << js_type_namespace(tstruct->get_program()) << t->get_name() << ") {" << endl
+				<< indent() << indent() << "this." << (*m_iter)->get_name() << " = args;" << endl
+				<< indent() << indent() << "return;" << endl
+				<< indent() << "}" << endl;
+    	}
+    }
+
     out << indent() <<  "if (args) {" << endl;
 
     for (m_iter = members.begin(); m_iter != members.end(); ++m_iter) {
@@ -856,11 +867,11 @@ void t_js_generator::generate_process_function(t_service* tservice,
     if (!first) {
         f_service_ << ", ";
     }
-    f_service_ << "function (err, response) {" << endl;
+    f_service_ << "function (err, result) {" << endl;
     indent_up();
 
     f_service_ <<
-      indent() << "var result = new " << resultname << "((err != null ? err : {success: response}));" << endl <<
+      indent() << "var result = new " << resultname << "((err != null ? err : {success: result}));" << endl <<
       indent() << "output.writeMessageBegin(\"" << tfunction->get_name() <<
         "\", Thrift.MessageType.REPLY, seqid);" << endl <<
       indent() << "result.write(output);" << endl <<
