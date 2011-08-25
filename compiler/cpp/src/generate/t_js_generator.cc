@@ -856,11 +856,11 @@ void t_js_generator::generate_process_function(t_service* tservice,
     if (!first) {
         f_service_ << ", ";
     }
-    f_service_ << "function (success) {" << endl;
+    f_service_ << "function (err, response) {" << endl;
     indent_up();
 
     f_service_ <<
-      indent() << "var result = new " << resultname << "((typeof success === 'object' && typeof success.read !== 'function' ? success : {\"success\": success}));" << endl <<
+      indent() << "var result = new " << resultname << "((err != null ? err : {success: response}));" << endl <<
       indent() << "output.writeMessageBegin(\"" << tfunction->get_name() <<
         "\", Thrift.MessageType.REPLY, seqid);" << endl <<
       indent() << "result.write(output);" << endl <<
