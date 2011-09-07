@@ -571,7 +571,14 @@ abstract class TBase {
             switch ($ftype) {
             case TType::STRUCT:
               $class = $fspec['class'];
-              $this->$var = new $class();
+              // Workaround for HipHop PHP
+              if (strpos('\\',$class) !== false) {
+              	$serialized = 'O:'.strlen(ltrim($class,'\\')).':"'.ltrim($class,'\\').'":0:{}';
+              	$this->$var = unserialize($serialized);
+              	$this->$var->__construct();
+              } else {
+              	$this->$var = new $class();
+              }
               $xfer += $this->$var->read($input);
               break;
             case TType::MAP:
