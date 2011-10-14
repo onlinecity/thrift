@@ -36,8 +36,11 @@ template <class Transport_>
 class TBinaryProtocolT
   : public TVirtualProtocol< TBinaryProtocolT<Transport_> > {
  protected:
-  static const int32_t VERSION_MASK = 0xffff0000;
-  static const int32_t VERSION_1 = 0x80010000;
+  // Temporary fix for gcc 4.6.1.
+//  static const int32_t VERSION_MASK = 0xffff0000;
+//  static const int32_t VERSION_1 = 0x80010000;
+  static const int32_t VERSION_MASK = -0x00010000;
+  static const int32_t VERSION_1 = -0x7fff0000;
   // VERSION_2 (0x80020000)  is taken by TDenseProtocol.
 
  public:
