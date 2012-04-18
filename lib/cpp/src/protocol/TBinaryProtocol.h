@@ -23,6 +23,7 @@
 #include "TProtocol.h"
 #include "TVirtualProtocol.h"
 
+#include <netinet/in.h>
 #include <boost/shared_ptr.hpp>
 
 namespace apache { namespace thrift { namespace protocol {
