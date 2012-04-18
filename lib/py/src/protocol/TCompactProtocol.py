@@ -1,3 +1,22 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements. See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership. The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License. You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied. See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
 from TProtocol import *
 from struct import pack, unpack
 
@@ -13,6 +32,7 @@ CONTAINER_READ = 6
 VALUE_READ = 7
 BOOL_READ = 8
 
+
 def make_helper(v_from, container):
   def helper(func):
     def nested(self, *args, **kwargs):
@@ -23,11 +43,14 @@ def make_helper(v_from, container):
 writer = make_helper(VALUE_WRITE, CONTAINER_WRITE)
 reader = make_helper(VALUE_READ, CONTAINER_READ)
 
+
 def makeZigZag(n, bits):
   return (n << 1) ^ (n >> (bits - 1))
 
+
 def fromZigZag(n):
   return (n >> 1) ^ -(n & 1)
+
 
 def writeVarint(trans, n):
   out = []
@@ -40,6 +63,7 @@ def writeVarint(trans, n):
       n = n >> 7
   trans.write(''.join(map(chr, out)))
 
+
 def readVarint(trans):
   result = 0
   shift = 0
@@ -50,6 +74,7 @@ def readVarint(trans):
     if byte >> 7 == 0:
       return result
     shift += 7
+
 
 class CompactType:
   STOP = 0x00
@@ -67,7 +92,7 @@ class CompactType:
   STRUCT = 0x0C
 
 CTYPES = {TType.STOP: CompactType.STOP,
-          TType.BOOL: CompactType.TRUE, # used for collection
+          TType.BOOL: CompactType.TRUE,  # used for collection
           TType.BYTE: CompactType.BYTE,
           TType.I16: CompactType.I16,
           TType.I32: CompactType.I32,
@@ -87,8 +112,9 @@ TTYPES[CompactType.FALSE] = TType.BOOL
 del k
 del v
 
+
 class TCompactProtocol(TProtocolBase):
-  "Compact implementation of the Thrift protocol driver."
+  """Compact implementation of the Thrift protocol driver."""
 
   PROTOCOL_ID = 0x82
   VERSION = 1
@@ -198,18 +224,18 @@ class TCompactProtocol(TProtocolBase):
 
   def writeBool(self, bool):
     if self.state == BOOL_WRITE:
-        if bool:
-            ctype = CompactType.TRUE
-        else:
-            ctype = CompactType.FALSE
-        self.__writeFieldHeader(ctype, self.__bool_fid)
+      if bool:
+        ctype = CompactType.TRUE
+      else:
+        ctype = CompactType.FALSE
+      self.__writeFieldHeader(ctype, self.__bool_fid)
     elif self.state == CONTAINER_WRITE:
-       if bool:
-           self.__writeByte(CompactType.TRUE)
-       else:
-           self.__writeByte(CompactType.FALSE)
+      if bool:
+        self.__writeByte(CompactType.TRUE)
+      else:
+        self.__writeByte(CompactType.FALSE)
     else:
-      raise AssertionError, "Invalid state in compact protocol"
+      raise AssertionError("Invalid state in compact protocol")
 
   writeByte = writer(__writeByte)
   writeI16 = writer(__writeI16)
@@ -345,7 +371,8 @@ class TCompactProtocol(TProtocolBase):
     elif self.state == CONTAINER_READ:
       return self.__readByte() == CompactType.TRUE
     else:
-      raise AssertionError, "Invalid state in compact protocol: %d" % self.state
+      raise AssertionError("Invalid state in compact protocol: %d" %
+                           self.state)
 
   readByte = reader(__readByte)
   __readI16 = __readZigZag

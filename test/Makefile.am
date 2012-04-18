@@ -17,10 +17,18 @@
 # under the License.
 #
 
-SUBDIRS =
+SUBDIRS = nodejs
 
 if WITH_CPP
 SUBDIRS += cpp
+endif
+
+if WITH_PERL
+SUBDIRS += perl
+endif
+
+if WITH_PHP
+SUBDIRS += php
 endif
 
 if WITH_PYTHON
@@ -38,15 +46,17 @@ endif
 
 EXTRA_DIST = \
 	cpp \
-	threads \
 	csharp \
+	erl \
+	hs \
+	nodejs \
+	ocaml \
+	perl \
+	php \
 	py \
 	py.twisted \
 	rb \
-	perl \
-	php \
-	hs \
-	ocaml \
+	threads \
 	AnnotationTest.thrift \
 	BrokenConstants.thrift \
 	ConstantsDemo.thrift \

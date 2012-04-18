@@ -144,7 +144,7 @@
       <exec executable="Xvfb" spawn="true" failonerror="false">
         <arg line=":99" />
       </exec>
-      <java classname="test.Httpd" fork="true" timeout="5000"
+      <java classname="test.Httpd" fork="true" timeout="10000"
         classpathref="test.classpath" failonerror="false" output="${build}/log/unittest.log">
         <arg value="../" />
       </java>
@@ -253,6 +253,7 @@
     <artifact:dependencies filesetId="js.test.dependency.jars">
       <dependency groupId="org.apache.httpcomponents" artifactId="httpclient" version="4.0.1"/>
       <dependency groupId="com.googlecode.jslint4java" artifactId="jslint4java-ant" version="1.4.6"/>
+      <dependency groupId="eu.medsea.mimeutil" artifactId="mime-util" version="2.1.3"/>
       <!-- get jstestdriver.jar via maven-->
       <remoteRepository id="jstd-maven-plugin google code repo" url="http://jstd-maven-plugin.googlecode.com/svn/maven2"/>
       <dependency groupId="com.google.jstestdriver" artifactId="maven-jstestdriver-plugin" version="1.3.2.3"/>

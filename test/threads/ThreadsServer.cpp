@@ -21,14 +21,14 @@
 // You should copy it to another filename to avoid overwriting it.
 
 #include "ThreadsTest.h"
-#include <protocol/TBinaryProtocol.h>
-#include <server/TThreadPoolServer.h>
-#include <server/TThreadedServer.h>
-#include <transport/TServerSocket.h>
-#include <transport/TTransportUtils.h>
+#include <thrift/protocol/TBinaryProtocol.h>
+#include <thrift/server/TThreadPoolServer.h>
+#include <thrift/server/TThreadedServer.h>
+#include <thrift/transport/TServerSocket.h>
+#include <thrift/transport/TTransportUtils.h>
 #include <thrift/concurrency/Monitor.h>
 #include <thrift/concurrency/ThreadManager.h>
-#include <thrift/concurrency/PosixThreadFactory.h>
+#include <thrift/concurrency/PlatformThreadFactory.h>
 
 using boost::shared_ptr;
 using namespace apache::thrift;
@@ -111,8 +111,8 @@ int main(int argc, char **argv) {
   /*
   shared_ptr<ThreadManager> threadManager =
     ThreadManager::newSimpleThreadManager(10);
-  shared_ptr<PosixThreadFactory> threadFactory =
-    shared_ptr<PosixThreadFactory>(new PosixThreadFactory());
+  shared_ptr<PlatformThreadFactory> threadFactory =
+    shared_ptr<PlatformThreadFactory>(new PlatformThreadFactory());
   threadManager->threadFactory(threadFactory);
   threadManager->start();
 
