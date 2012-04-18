@@ -557,6 +557,17 @@ void t_js_generator::generate_js_struct_definition(ofstream& out,
       }
     }
 
+    // Early returns for exceptions
+    for (m_iter = members.begin(); m_iter != members.end(); ++m_iter) {
+     t_type* t = get_true_type((*m_iter)->get_type());
+     if (t->is_xception()) {
+		out << indent() << "if (args instanceof " << js_type_namespace(t->get_program()) << t->get_name() << ") {" << endl
+		<< indent() << indent() << "this." << (*m_iter)->get_name() << " = args;" << endl
+		<< indent() << indent() << "return;" << endl
+		<< indent() << "}" << endl;
+     }
+    }
+
     out << indent() <<  "if (args) {" << endl;
 
     for (m_iter = members.begin(); m_iter != members.end(); ++m_iter) {
@@ -688,7 +699,7 @@ void t_js_generator::generate_js_struct_writer(ofstream& out,
   indent(out) << "output.writeStructBegin('" << name << "');" << endl;
 
   for (f_iter = fields.begin(); f_iter != fields.end(); ++f_iter) {
-    out << indent() << "if (this." << (*f_iter)->get_name() << ") {" << endl;
+	out << indent() << "if (this." << (*f_iter)->get_name() << " != null) {" << endl;
     indent_up();
 
     indent(out) <<
@@ -836,12 +847,6 @@ void t_js_generator::generate_process_function(t_service* tservice,
         indent() << "args.read(input);" << endl <<
         indent() << "input.readMessageEnd();" << endl;
 
-    // Declare result for non oneway function
-    if (!tfunction->is_oneway()) {
-        f_service_ <<
-            indent() << "var result = new " << resultname << "();" << endl;
-    }
-
     // Generate the function call
     t_struct* arg_struct = tfunction->get_arglist();
     const std::vector<t_field*>& fields = arg_struct->get_members();
@@ -871,11 +876,11 @@ void t_js_generator::generate_process_function(t_service* tservice,
     if (!first) {
         f_service_ << ", ";
     }
-    f_service_ << "function (success) {" << endl;
+    f_service_ << "function (err, result) {" << endl;
     indent_up();
 
     f_service_ <<
-      indent() << "result.success = success;" << endl <<
+      indent() << "var result = new " << resultname << "((err != null ? err : {success: result}));" << endl <<
       indent() << "output.writeMessageBegin(\"" << tfunction->get_name() <<
         "\", Thrift.MessageType.REPLY, seqid);" << endl <<
       indent() << "result.write(output);" << endl <<
@@ -1251,7 +1256,7 @@ void t_js_generator::generate_deserialize_field(ofstream &out,
           name;
         break;
       case t_base_type::TYPE_STRING:
-        out << "readString()";
+    	out << (((t_base_type*)type)->is_binary() ? "readBinary()" : "readString()");
         break;
       case t_base_type::TYPE_BOOL:
         out << "readBool()";
