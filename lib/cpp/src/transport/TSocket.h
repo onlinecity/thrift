@@ -28,6 +28,7 @@
 #ifdef HAVE_NETDB_H
 #include <netdb.h>
 #endif
+#include <netinet/in.h>
 
 #include "TTransport.h"
 #include "TVirtualTransport.h"
